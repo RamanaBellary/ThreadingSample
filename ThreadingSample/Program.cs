@@ -37,44 +37,30 @@ namespace ThreadingSample
     }
     class Program
     {
-        static AutoResetEvent are1 = new AutoResetEvent(true);
-        static AutoResetEvent are2 = new AutoResetEvent(false);
-
-        static Task<TResult> Run<TResult>(Func<TResult> fun)
-        {
-            var tcs = new TaskCompletionSource<TResult>();
-            new Thread(() =>
-            {
-                try
-                {
-                    tcs.SetResult(fun());
-                }
-                catch (Exception e)
-                {
-                    tcs.SetException(e);
-                }
-            }).Start();
-            return tcs.Task;
-        }
-
-        static Task<int> LongRunningAsyncTask()
-        {
-            return Task.Run(() => { Thread.Sleep(5000); return 100; });
-        }
-
-        static async void DisplayLongRunningAsyncTaskResult()
-        {
-            var result = await LongRunningAsyncTask();
-            Console.WriteLine("Result:" + result);
-        }
-
-        static void PrintSum(int sum)
-        {
-            Console.WriteLine("Sum :" + sum);
-        }
-
         static void Main(string[] args)
         {
+            #region AutoResetEvent
+            //for (int i = 1; i <= 3; i++)
+            //{
+            //    Thread t = new Thread(AutoResetEventMethod);
+            //    t.Name = "t" + i;
+            //    t.Start();
+            //}
+            //are.Set();
+            //are.Set();
+            //are.Set();
+            #endregion
+
+            #region MaualResetEvent
+            //for (int i = 1; i <= 3; i++)
+            //{
+            //    Thread t = new Thread(ManualResetEventMethod);
+            //    t.Name = "t" + i;
+            //    t.Start();
+            //}
+            //mre.Set(); 
+            #endregion
+
             #region Using Callback in a Thread
             //PrintSumOfNumbersDelegate sumDel = PrintSum;
             //Numbers num = new Numbers(Convert.ToInt32( Console.ReadLine()), sumDel);
@@ -116,12 +102,12 @@ namespace ThreadingSample
             #endregion
 
             #region SpinWait
-            for (int i = 1; i <= 10; i++)
-            {
-                Thread t = new Thread(SpinWaitEx.Do);
-                t.Name = "t" + i;
-                t.Start();
-            }
+            //for (int i = 1; i <= 10; i++)
+            //{
+            //    Thread t = new Thread(SpinWaitEx.Do);
+            //    t.Name = "t" + i;
+            //    t.Start();
+            //}
             #endregion
 
             //DisplayLongRunningAsyncTaskResult();
@@ -213,6 +199,42 @@ namespace ThreadingSample
             Console.ReadLine();
         }
 
+        static AutoResetEvent are1 = new AutoResetEvent(true);
+        static AutoResetEvent are2 = new AutoResetEvent(false);
+
+        static Task<TResult> Run<TResult>(Func<TResult> fun)
+        {
+            var tcs = new TaskCompletionSource<TResult>();
+            new Thread(() =>
+            {
+                try
+                {
+                    tcs.SetResult(fun());
+                }
+                catch (Exception e)
+                {
+                    tcs.SetException(e);
+                }
+            }).Start();
+            return tcs.Task;
+        }
+
+        static Task<int> LongRunningAsyncTask()
+        {
+            return Task.Run(() => { Thread.Sleep(5000); return 100; });
+        }
+
+        static async void DisplayLongRunningAsyncTaskResult()
+        {
+            var result = await LongRunningAsyncTask();
+            Console.WriteLine("Result:" + result);
+        }
+
+        static void PrintSum(int sum)
+        {
+            Console.WriteLine("Sum :" + sum);
+        }
+
         private const int REPETITIONS = 5;
 
         private static void DoWork(int i)
@@ -291,6 +313,21 @@ namespace ThreadingSample
         void Go(string s)
         {
             Console.WriteLine(s);
+        }
+
+        static ManualResetEvent mre = new ManualResetEvent(false);
+        static AutoResetEvent are = new AutoResetEvent(false);
+        private static void AutoResetEventMethod()
+        {
+            Console.WriteLine($"Thread {Thread.CurrentThread.Name} waiting for the signal");
+            are.WaitOne();
+            Console.WriteLine($"Thread {Thread.CurrentThread.Name} got the signal");
+        }
+        private static void ManualResetEventMethod()
+        {
+            Console.WriteLine($"Thread {Thread.CurrentThread.Name} waiting for the signal");
+            mre.WaitOne();
+            Console.WriteLine($"Thread {Thread.CurrentThread.Name} got the signal");
         }
     }
 }
